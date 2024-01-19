@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<div class="container mt-4">
+    
+    <div class="p-4 m-4">
+
+        
+        <div class="col-lg-5 rounded mx-auto border pt-4">
+            <div class="text-center col">
+            
+            <!-- <hr> -->
+            <div class="display-8">User Profile</div>
+            <hr>
+            </div>
+            <h3 hidden class="alert alert-light border rounded">Create An Account</h3>
+        
+                    <form action="/userprofile" method="POST">
+                
+                {% csrf_token %}
+
+                {% if error%}
+                <div class="alert alert-danger" role="alert">
+                    {{error}}
+                </div>
+                {% endif %}
+                <!-- firstname -->
+                <div class="form-group">
+                    <label for="">First Name</label>
+                    <input type="text" name="first_name"
+                     id="first_name" value="{{customer.first_name}}" class="form-control form-control-sm" 
+                     placeholder="">
+                </div>
+
+                <!-- last name -->
+                <div class="form-group">
+                    <label for="">Last Name</label>
+                    <input type="text" name="last_name" 
+                    id="last_name" value="{{customer.last_name}}" class="form-control form-control-sm"
+                    >
+                </div>
+
+                <!-- phone -->
+                <div class="form-group">
+                    <label for="">Phone</label>
+                    <input type="text" name="phone" 
+                    id="phone" class="form-control form-control-sm"
+                    value="{{customer.phone}}"
+                    
+                    >
+                </div>
+                <!-- email -->
+                <div class="form-group">
+                    <label for="">Email</label>
+                    <input required type="email" name="email" id="email"
+                    value="{{customer.email}}" 
+                    class=" form-control-sm form-control" >
+                </div>
+
+
+                <!-- password -->
+
+
+                <hr>
+                <div class="form-group">
+                    <input class="btn btn-sm btn-info" type="submit" value="Update">
+                </div>
+
+                
+            </form>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <footer class="py-3 my-4" style="background-color: black">
+      <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+        <li class="nav-item"><a href="#" class="nav-link px-2 " style="color:white">Home</a></li>
+        <li class="nav-item"><a href="/store1" class="nav-link px-2 " style="color:white">Products</a></li>
+        
+        <li class="nav-item"><a href="/aboutus" class="nav-link px-2 " style="color:white">About us</a></li>
+      </ul>
+      <p class="text-center "style="color:white">&copy; 2021 Company, Inc</p>
+    </footer>
+  </div>
+{% endblock %}
