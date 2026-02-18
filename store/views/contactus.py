@@ -34,7 +34,7 @@ class contactus(View):
             print(name,  email, message)
             
             contactus.register()
-            return render(request, 'contactus.html', {'error':'Your Message Added Successfully..'})
+            return render(request, 'contactus.html', {'success':'Your Message Added Successfully..'})
         else:
             data = {
                 'error': error_message,

@@ -18,33 +18,33 @@
 
 <body>
     <section style="background-color:whitesmoke">
-    <nav class="navbar navbar-expand navbar-dark bg-dark" aria-label="Second navbar example" >
-        <div class="container-fluid">
-           
+        <nav class="navbar navbar-expand navbar-dark bg-dark" aria-label="Second navbar example">
+            <div class="container-fluid">
 
-            
-        </div>
-    </nav>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-        crossorigin="anonymous"></script>
 
-    <div class="container">
 
-        <div class="col-md-12">
-            <div class="page-title-heading">
-                <h3>About Us</h3>
             </div>
-        </div>
-    </div><!-- page-title end-->
-    <hr>
+        </nav>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+            crossorigin="anonymous"></script>
 
-    <!--site-main start-->
-    <div class="site-main">
+        <div class="container">
 
-        <!--history-section-->
-        <section class="history-section clearfix">
-            <div class="container">
+            <div class="col-md-12">
+                <div class="page-title-heading">
+                    <h3>About Us</h3>
+                </div>
+            </div>
+        </div><!-- page-title end-->
+        <hr>
+
+        <!--site-main start-->
+        <div class="site-main">
+
+            <!--history-section-->
+            <section class="history-section clearfix">
+                <div class="container">
                     <!-- section title -->
                     <div class="section-title clearfix">
                         <div class="title-header">
@@ -55,12 +55,14 @@
                             2014, we are providing mobile product to the customer at the reasonable
                             price </div>
                     </div><!-- section title end -->
-                    <p>We are doing wholesale and retails business of mobile products, the products are sold out in lumpsum quantity, and there
+                    <p>We are doing wholesale and retails business of mobile products, the products are sold out in
+                        lumpsum quantity, and there
                         are no worries in product quality, that is absolutely nice and that too at a reasonable
                         rate, kindly contact us for any queries.</p>
                     <div style="display: inline-flex; ">
                         <div style="padding: 20px;">
-                            <img class="img-fluid" src="{% static 'images/about/iphonemain4.jpg' %}" alt="loading" style="width: 400px;;">
+                            <img class="img-fluid" src="{% static 'images/about/iphonemain4.jpg' %}" alt="loading"
+                                style="width: 400px;;">
                             <!-- ttm-fid -->
                             <h4 class="ttm-fid-title"><span>founded in 2014</span></h4>
                         </div>
@@ -84,25 +86,26 @@
                         </div>
 
                     </div>
+                </div>
+            </section>
+            <!-- history-section end -->
+            <hr>
+            <!--team-section-->
+
+
+            <div>
+                <footer class="py-3 my-4">
+                    <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+                        <li class="nav-item"><a href="../" class="nav-link px-2 text-muted">Home</a></li>
+                        <li class="nav-item"><a href="/aboutus" class="nav-link px-2 text-muted">About us</a></li>
+                        <li class="nav-item"><a href="/store" class="nav-link px-2 text-muted">Products</a></li>
+                    </ul>
+                    <p class="text-center text-muted">&copy; 2021 Company, Inc</p>
+                </footer>
             </div>
-        </section>
-        <!-- history-section end -->
-        <hr>
-        <!--team-section-->
-      
-        
-    <div>
-        <footer class="py-3 my-4">
-          <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-            <li class="nav-item"><a href="../" class="nav-link px-2 text-muted">Home</a></li>
-            <li class="nav-item"><a href="/aboutus" class="nav-link px-2 text-muted">About us</a></li>
-            <li class="nav-item"><a href="../store1" class="nav-link px-2 text-muted">Products</a></li>
-          </ul>
-          <p class="text-center text-muted">&copy; 2021 Company, Inc</p>
-        </footer>
-      </div>
-   </div>
-   </section>   
+        </div>
+    </section>
 </body>
+
 </html>
 {% endblock %}

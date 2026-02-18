@@ -7,6 +7,12 @@ class Customer(models.Model):
     phone = models.CharField(max_length=15)
     email = models.EmailField()
     password = models.CharField(max_length=500)
+    
+    # Address Details
+    address = models.CharField(max_length=255, default='', blank=True, null=True)
+    city = models.CharField(max_length=50, default='', blank=True, null=True)
+    state = models.CharField(max_length=50, default='', blank=True, null=True)
+    zipcode = models.CharField(max_length=10, default='', blank=True, null=True)
 
     def register(self):
         self.save()

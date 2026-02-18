@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load custom_filter %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-lg border-0" id="invoice-card">
+                <div class="card-body p-5">
+
+                    <!-- Header -->
+                    <div class="row mb-5 align-items-center">
+                        <div class="col-6">
+                            <h2 class="fw-bold text-primary"><i class="bi bi-receipt me-2"></i>INVOICE</h2>
+                            <p class="text-muted mb-0">Invoice ID: #{{invoice_id|slice:":8"}}</p>
+                            <p class="text-muted">Date: {{date}}</p>
+                        </div>
+                        <div class="col-6 text-end">
+                            <h4 class="fw-bold">TechStore</h4>
+                            <p class="mb-0">123 Tech Street, Silicon Valley</p>
+                            <p class="mb-0">support@techstore.com</p>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Customer & Shipping -->
+                    <div class="row mb-5">
+                        <div class="col-md-6">
+                            <h6 class="fw-bold text-uppercase text-muted mb-3">Billed To</h6>
+                            <h5 class="fw-bold">{{customer.first_name}} {{customer.last_name}}</h5>
+                            <p class="mb-0">{{customer.email}}</p>
+                            <p class="mb-0">{{customer.phone}}</p>
+                        </div>
+                        <div class="col-md-6 text-md-end">
+                            <h6 class="fw-bold text-uppercase text-muted mb-3">Shipped To</h6>
+                            <p class="mb-0 w-75 ms-auto">{{address}}</p>
+                        </div>
+                    </div>
+
+                    <!-- Items Table -->
+                    <div class="table-responsive mb-5">
+                        <table class="table table-borderless">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th scope="col" class="py-3 ps-4">Item</th>
+                                    <th scope="col" class="py-3 text-center">Quantity</th>
+                                    <th scope="col" class="py-3 text-end">Price</th>
+                                    <th scope="col" class="py-3 text-end pe-4">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                <tr>
+                                    <td class="py-3 ps-4">
+                                        <div class="fw-bold">{{order.product.name}}</div>
+                                        <small class="text-muted">{{order.product.category}}</small>
+                                    </td>
+                                    <td class="py-3 text-center">{{order.quantity}}</td>
+                                    <td class="py-3 text-end">{{order.price|currency}}</td>
+                                    <td class="py-3 text-end pe-4">{{order.price|multiply:order.quantity|currency}}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot class="border-top">
+                                <tr>
+                                    <td colspan="3" class="text-end py-2">Subtotal</td>
+                                    <td class="text-end py-2 pe-4">{{original_total|currency}}</td>
+                                </tr>
+                                {% if total_discount > 0 %}
+                                <tr>
+                                    <td colspan="3" class="text-end py-2 text-success">Discount Applied</td>
+                                    <td class="text-end py-2 pe-4 text-success">-{{total_discount|currency}}</td>
+                                </tr>
+                                {% endif %}
+                                <tr>
+                                    <td colspan="3" class="text-end fw-bold py-4">Total Amount</td>
+                                    <td class="text-end fw-bold py-4 pe-4 h5 text-primary">{{total_amount|currency}}
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="d-flex justify-content-between align-items-center mt-5 no-print">
+                        <a href="/store" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-2"></i>Continue Shopping
+                        </a>
+                        <button onclick="window.print()" class="btn btn-primary btn-lg shadow-sm">
+                            <i class="bi bi-printer me-2"></i>Print Invoice
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+
+        #invoice-card,
+        #invoice-card * {
+            visibility: visible;
+        }
+
+        #invoice-card {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        .no-print {
+            display: none !important;
+        }
+    }
+</style>
+{% endblock %}

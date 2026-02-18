@@ -9,10 +9,17 @@ class userprofile(View):
     
   def get(self, request):
        
-      email = request.POST.get('email')
-      customer = request.session.get('customer')
-      print("id is",customer)
-      return render(request,'userprofile.html', {'customer' : customer})
+      customer_id = request.session.get('customer')
+      if customer_id:
+          try:
+            customer = Customer.objects.get(id=customer_id)
+            print("id is", customer)
+            return render(request, 'userprofile.html', {'customer': customer})
+          except Customer.DoesNotExist:
+             request.session.clear()
+             return redirect('login')
+      else:
+          return redirect('login')
 
 
   def post(self, request):
@@ -23,6 +30,10 @@ class userprofile(View):
         last_name = request.POST.get('last_name')
         phone = request.POST.get('phone')
         email = request.POST.get('email')
+        address = request.POST.get('address')
+        city = request.POST.get('city')
+        state = request.POST.get('state')
+        zipcode = request.POST.get('zipcode')
         # validation
         value = {
             'first_name': first_name,
@@ -37,9 +48,13 @@ class userprofile(View):
             request.session['customer'] = customer.id
             print( request.session['customer'] )
             # customer.password = make_password(customer.password)
-            customer=Customer.objects.filter(id=customer.id).update(first_name=first_name,last_name=last_name,phone=phone,email=email)
+            customer=Customer.objects.filter(id=customer.id).update(first_name=first_name,last_name=last_name,phone=phone,email=email,address=address,city=city,state=state,zipcode=zipcode)
+            
+            # Re-fetch updated customer to show in form
+            customer = Customer.objects.get(id=request.session.get('customer'))
+            
             print("ss=",customer)
-            return render(request, 'userprofile.html', {'error':'Your Profile Updated  Successfully..'})
+            return render(request, 'userprofile.html', {'success':'Your Profile Updated  Successfully..', 'customer': customer})
       
         return render(request, 'userprofile.html', {'error': error_message})
 

@@ -1,120 +1,174 @@
 {% extends 'base.html' %}
 
-
 {% block content %}
 {% load cart %}
 {% load custom_filter %}
-<div class="container">
-   <div class="border rounded p-4 m-4">
-        <p class="display-4 pl-4 ml-4">Your Cart</p>
-        <hr>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Sno.</th>
-                    <th>Image</th>
-                    <th>Product</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Total</th>
-                    <th>Action</th>
-                </tr>
+
+<div class="container py-5 mb-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="display-6 fw-bold mb-0">Your Cart</h2>
+    <span class="badge bg-primary rounded-pill fs-6">{{ request.session.cart.keys|length }} items</span>
+  </div>
+
+  {% if products %}
+  <div class="row g-4 align-items-start">
+    <!-- Products List (Left Side) -->
+    <div class="col-lg-8">
+      <div class="card card-custom p-4 border-0 shadow-sm">
+        <div class="table-responsive">
+          <table class="table table-borderless align-middle mb-0">
+            <thead class="border-bottom">
+              <tr>
+                <th scope="col" class="text-muted text-uppercase small py-3">Product</th>
+                <th scope="col" class="text-muted text-uppercase small py-3">Price</th>
+                <th scope="col" class="text-muted text-uppercase small py-3">Quantity</th>
+                <th scope="col" class="text-muted text-uppercase small py-3 text-end">Total</th>
+              </tr>
             </thead>
             <tbody>
-                
-                {% for product in products %}
-                <tr>
-                    <td>{{forloop.counter}}</td>
-                    <td><img style="height: 80px;" class="rounded-circle" src="{{product.image.url}}" alt=""></td>
-                    <td>{{product.name}}</td>
-                    <td>{{product.price|currency}}</td>
-                    <td>{{product|cart_quantity:request.session.cart}}</td>
-                    <td>{{product|price_total:request.session.cart|currency}}</td>
-          {% if product|is_in_cart:request.session.cart %}
-                    <td>
-                          <form action="/#{{product.id}}" class="col-2 " method="post">
-                    {% csrf_token %}
-                    <input hidden type="text" name='product' value='{{product.id}}'>
-                    <input hidden type="text" name='remove' value='True'>
-                    <input type="submit" value=" Remove" class="btn  border-right" style="background-color: #17a2b8">
-              </form> </td>
-           {% endif %}
-                </tr>
-
-                {% endfor %}
-               
-            </tbody>
-
-            <tfoot>
-                <tr>
-                    <th colspan="5"></th>
-                    <th class="" colspan="">Total</th>
-                    <th>{{products|total_cart_price:request.session.cart|currency}}</th>
-                </tr>
-            </tfoot>
-        </table>
-        <hr>
-        <div class="m-3 p-3">
-            <a href="#" data-toggle="modal" data-target="#exampleModal" class="btn btn-outline-info border rounded  col-lg-3 float-right">Cash On Delivery </a>
-            <a href="https://paytm.com/"  class="btn btn-outline-info border rounded  col-lg-3 float-right">Online Payment </a>
-        </div>
-         <div class="m-3 p-3">
-            
-        </div>
-   </div>
-</div>
-
-
-<!-- modal -->
-
-  <!-- Modal -->
-  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">
-              Cash On Delivery
-          </h5>
-          <hr>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="m-2 p-3">
-            <form action="/check-out" method="POST">
-                {% csrf_token %}
-                <div class="form-group">
-                  <label for="">Address</label>
-                  <input type="text" name="address" id="" class="form-control" placeholder="" aria-describedby="helpId">
-                  
-                </div>
-                <div class="form-group">
-                    <label for="">Phone</label>
-                    <input type="text" name="phone" id="" class="form-control" placeholder="" aria-describedby="helpId">
+              {% for product in products %}
+              <tr class="border-bottom last-no-border">
+                <td class="py-4">
+                  <div class="d-flex align-items-center">
+                    <img style="height: 80px; width: 80px; object-fit: contain;" class="rounded-3 border me-3 bg-light"
+                      src="{{product.image.url}}" alt="{{product.name}}">
+                    <div>
+                      <h6 class="mb-1 fw-bold text-dark">{{product.name}}</h6>
+                      <small class="text-muted">{{product.category.name}}</small>
+                    </div>
                   </div>
-                
+                </td>
+                <td class="py-4 text-nowrap align-middle">
+                  <span class="text-muted">{{product.price|currency}}</span>
+                </td>
+                <td class="py-4 align-middle">
+                  <div class="d-flex align-items-center bg-light rounded-pill border p-1" style="width: fit-content;">
+                    <form action="/#{{product.id}}" method="post" class="m-0">
+                      {% csrf_token %}
+                      <input hidden type="text" name='product' value='{{product.id}}'>
+                      <input hidden type="text" name='remove' value='True'>
+                      <button type="submit" class="btn btn-sm btn-link text-dark p-0 px-2 text-decoration-none">
+                        <i class="fas fa-minus small"></i>
+                      </button>
+                    </form>
 
-                  <input type="submit" class="btn float-right btn-outline-info col-lg-6" value="Check out">
-            </form>
-              
-          </div>
+                    <span class="mx-2 fw-bold small">{{product|cart_quantity:request.session.cart}}</span>
+
+                    <form action="/#{{product.id}}" method="post" class="m-0">
+                      {% csrf_token %}
+                      <input hidden type="text" name='product' value='{{product.id}}'>
+                      <button type="submit" class="btn btn-sm btn-link text-dark p-0 px-2 text-decoration-none">
+                        <i class="fas fa-plus small"></i>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+                <td class="py-4 fw-bold text-end align-middle fs-5 text-dark">
+                  {{product|price_total:request.session.cart|currency}}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
-        <div>
-           
+      </div>
+    </div>
+
+    <!-- Order Summary (Right Side) -->
+    <div class="col-lg-4">
+      <div class="card card-custom p-4 border-0 shadow-sm sticky-top"
+        style="top: 0px; background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);">
+        <h4 class="mb-4 fw-bold">Order Summary</h4>
+
+        <div class="d-flex justify-content-between mb-3">
+          <span class="text-muted">Subtotal</span>
+          <span class="fw-bold text-nowrap">{{products|total_cart_price:request.session.cart|currency}}</span>
+        </div>
+        <div class="d-flex justify-content-between mb-3">
+          <span class="text-muted">Shipping Estimate</span>
+          <span class="text-success fw-bold">Free</span>
+        </div>
+        <div class="d-flex justify-content-between mb-4">
+          <span class="text-muted">Tax Estimate</span>
+          <span class="text-muted fw-bold">₹0</span>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="d-flex justify-content-between mb-4 align-items-center">
+          <span class="fs-5 fw-bold text-dark">Total Order</span>
+          <span
+            class="fs-4 fw-bold text-primary-custom text-nowrap">{{products|total_cart_price:request.session.cart|currency}}</span>
+        </div>
+
+        <div class="d-grid gap-3">
+          <a href="/payment" class="btn btn-primary-custom btn-lg shadow-sm py-3 rounded-3 fw-bold">
+            Proceed to Checkout <i class="fas fa-arrow-right ms-2"></i>
+          </a>
+          <a href="/store" class="btn btn-outline-secondary btn-sm border-0 bg-transparent text-muted mt-2">
+            <i class="fas fa-arrow-left me-2"></i> Continue Shopping
+          </a>
         </div>
       </div>
     </div>
   </div>
-
-<div class="container">
-    <footer class="py-3 my-4" style="background-color: black">
-      <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-        <li class="nav-item"><a href="#" class="nav-link px-2 " style="color:white">Home</a></li>
-        <li class="nav-item"><a href="/store1" class="nav-link px-2 " style="color:white">Products</a></li>
-      </ul>
-      <p class="text-center "style="color:white">&copy; 2021 Company, Inc</p>
-    </footer>
+  {% else %}
+  <!-- Empty Cart State -->
+  <div class="row justify-content-center">
+    <div class="col-md-6 text-center py-5">
+      <div class="mb-4">
+        <div class="bg-light rounded-circle d-inline-flex align-items-center justify-content-center"
+          style="width: 120px; height: 120px;">
+          <i class="fas fa-shopping-bag fa-4x text-muted opacity-50"></i>
+        </div>
+      </div>
+      <h3 class="fw-bold mb-3">Your cart is currently empty</h3>
+      <p class="text-muted mb-4 px-5">Before proceeding to checkout you must add some products to your shopping cart.
+        You will find a lot of interesting products on our "Shop" page.</p>
+      <a href="/store" class="btn btn-primary-custom btn-lg px-5 rounded-pill shadow-sm">Start Shopping</a>
+    </div>
   </div>
+  {% endif %}
+</div>
+
+<style>
+  .card-custom {
+    border-radius: 12px;
+  }
+
+  .last-no-border:last-child {
+    border-bottom: 0 !important;
+  }
+</style>
+
+<!-- Checkout Modal -->
+<div class="modal fade" id="checkoutModal" tabindex="-1" aria-labelledby="checkoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="checkoutModalLabel">Checkout - Cash On Delivery</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="/check-out" method="POST">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="address" class="form-label">Delivery Address</label>
+            <textarea name="address" id="address" class="form-control" rows="3" required
+              placeholder="Enter your full address"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="phone" class="form-label">Phone Number</label>
+            <input type="tel" name="phone" id="phone" class="form-control" required
+              placeholder="Enter your mobile number">
+          </div>
+          <div class="d-grid">
+            <input type="submit" class="btn btn-primary-custom" value="Place Order">
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 
 {% endblock %}

@@ -125,4 +125,8 @@ MEDIA_ROOT = BASE_DIR
 
 STATICFILES_DIRS=(
     os.path.join(BASE_DIR,'static'),
-    )
+)
+
+# Email Configuration (Console Backend for Development)
+# This will print emails to the terminal instead of sending them.
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

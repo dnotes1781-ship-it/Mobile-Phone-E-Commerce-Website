@@ -1,0 +1,903 @@
+{% extends 'base.html' %}
+{% load custom_filter %}
+
+{% block content %}
+<div class="container py-5">
+    <style>
+        /* Premium E-commerce Styling */
+        :root {
+            --primary-color: #2874f0;
+            /* Flipkart Blue-ish */
+            --secondary-color: #fb641b;
+            --text-heading: #212121;
+            --text-body: #565959;
+            --border-color: #f0f0f0;
+            --bg-light: #f1f3f6;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        .payment-container {
+            max-width: 1200px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 4px;
+            /* Flatter look like Amazon/Flipkart */
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+            margin-bottom: 16px;
+        }
+
+        .card-header {
+            background-color: #fff;
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 24px;
+        }
+
+        .card-header h5 {
+            color: #878787;
+            text-transform: uppercase;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 0;
+            letter-spacing: 0.5px;
+        }
+
+        /* Payment Sidebar */
+        .payment-sidebar {
+            background-color: #f8f9fa;
+        }
+
+        .payment-sidebar .nav-link {
+            color: #212121;
+            border: none;
+            border-bottom: 1px solid #f0f0f0;
+            border-radius: 0;
+            padding: 16px 20px;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .payment-sidebar .nav-link i {
+            font-size: 1.2rem;
+            width: 32px;
+            color: #878787;
+        }
+
+        .payment-sidebar .nav-link:hover {
+            background-color: #fff;
+            color: var(--primary-color);
+        }
+
+        .payment-sidebar .nav-link:hover i {
+            color: var(--primary-color);
+        }
+
+        .payment-sidebar .nav-link.active {
+            background-color: #fff;
+            color: var(--primary-color);
+            font-weight: 600;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .payment-sidebar .nav-link.active i {
+            color: var(--primary-color);
+        }
+
+        /* Forms */
+        .form-control,
+        .form-select {
+            border-radius: 2px;
+            padding: 12px;
+            border-color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        .form-control:focus {
+            box-shadow: none;
+            border-color: var(--primary-color);
+        }
+
+
+        .price-details-header {
+            color: #878787;
+            font-weight: 600;
+            font-size: 16px;
+            text-transform: uppercase;
+            padding: 16px 24px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .price-details-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 15px;
+        }
+
+        .price-details-row.total {
+            border-top: 1px dashed #e0e0e0;
+            padding-top: 16px;
+            margin-top: 16px;
+            font-weight: 700;
+            font-size: 18px;
+            color: #212121;
+        }
+
+        .price-savings {
+            color: #388e3c;
+        }
+
+        /* Bank Offers */
+        .bank-offer-card {
+            background-color: #fbfbfb;
+            border: 1px dashed #cbd5e0 !important;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--secondary-color);
+            /* Orange for Call to Actions */
+            border-color: var(--secondary-color);
+            border-radius: 2px;
+            font-weight: 600;
+            padding: 10px 20px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            box-shadow: 0 2px 4px 0 rgba(0, 0, 0, .15);
+        }
+
+        .btn-primary:hover {
+            background-color: #e45b18;
+            border-color: #e45b18;
+        }
+
+        .btn-success {
+            background-color: var(--secondary-color);
+            /* Uniform CTA color */
+            border-color: var(--secondary-color);
+            border-radius: 2px;
+        }
+    </style>
+    <div class="row justify-content-center">
+        <!-- Main Column (Centered) -->
+        <div class="col-lg-8">
+
+            <!-- 1. Address Confirmation Section -->
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold">Delivery Address</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="address" class="form-label text-muted small fw-bold">Street Address</label>
+                        <textarea id="payment-address" class="form-control"
+                            rows="2">{{customer.address|default:''}}</textarea>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label for="city" class="form-label text-muted small fw-bold">City</label>
+                            <select id="payment-city" class="form-select">
+                                <option value="">Select City</option>
+                            </select>
+                        </div>
+                        <div class="col-4">
+                            <label for="state" class="form-label text-muted small fw-bold">State</label>
+                            <select id="payment-state" class="form-select">
+                                <option value="">Select State</option>
+                            </select>
+                        </div>
+                        <div class="col-2">
+                            <label for="zipcode" class="form-label text-muted small fw-bold">pincode</label>
+                            <input type="text" id="payment-zipcode" class="form-control"
+                                value="{{customer.zipcode|default:''}}">
+                        </div>
+                    </div>
+                    <div class="mb-0">
+                        <label for="phone" class="form-label text-muted small fw-bold">Phone</label>
+                        <input type="text" id="payment-phone" class="form-control"
+                            value="{{customer.phone|default:''}}">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Available Coupons -->
+            <div class="card shadow-sm border-0 mb-4 bank-offer-card">
+                <div class="card-header bg-white border-bottom-0 pt-3 pb-0">
+                    <h5 class="fw-bold mb-0"><i class="bi bi-tag-fill text-success me-2"></i>Available Coupons</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <!-- HDFC Coupon -->
+                        <button class="btn btn-outline-success text-start position-relative p-3 coupon-btn"
+                            onclick="applyCoupon('HDFC', this)">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="fw-bold mb-1">HDFC10</h6>
+                                    <small class="text-muted">10% Instant Discount</small>
+                                </div>
+                                <span
+                                    class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2">Apply</span>
+                            </div>
+                        </button>
+
+                        <!-- SBI Coupon -->
+                        <button class="btn btn-outline-success text-start position-relative p-3 coupon-btn"
+                            onclick="applyCoupon('SBI', this)">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="fw-bold mb-1">SBI200</h6>
+                                    <small class="text-muted">Flat ₹200 Off</small>
+                                </div>
+                                <span
+                                    class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2">Apply</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Price Details -->
+            <div class="card shadow-sm border-0 mb-4 price-details-card">
+                <div class="price-details-header">
+                    Price Details
+                </div>
+                <div class="card-body p-4">
+                    <div class="price-details-row">
+                        <span>Price ({{products|length}} items)</span>
+                        <span>{{total_amount|currency}}</span>
+                    </div>
+                    <div class="price-details-row">
+                        <span>Delivery Charges</span>
+                        <span class="price-savings">
+                            <span class="text-decoration-line-through text-muted me-1"
+                                style="font-weight: normal;">₹40</span>
+                            Free
+                        </span>
+                    </div>
+
+                    <div class="price-details-row total">
+                        <span>Total Payable</span>
+                        <span id="total-payable-display">{{total_amount|currency}}</span>
+                    </div>
+                    <div id="discount-row" class="price-details-row text-success fw-bold d-none">
+                        <span>Discount Applied</span>
+                        <span id="discount-amount">-₹0</span>
+                    </div>
+                </div>
+                <div class="card-footer bg-white p-3 border-top-0">
+                    <div class="d-flex align-items-center price-savings small fw-bold">
+                        <i class="bi bi-shield-check fs-4 me-2"></i>
+                        Safe and Secure Payments. 100% Authentic products.
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Payment Options -->
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0 fw-bold">Select Payment Request</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="d-flex align-items-start">
+                        <!-- Sidebar -->
+                        <div class="nav flex-column nav-pills me-0 bg-light h-100 payment-sidebar"
+                            style="min-width: 240px;" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                            <button class="nav-link active text-start fw-semibold mb-2" id="v-pills-upi-tab"
+                                data-bs-toggle="pill" data-bs-target="#v-pills-upi" type="button" role="tab"><i
+                                    class="bi bi-phone me-2"></i>UPI</button>
+                            <button class="nav-link text-start fw-semibold mb-2" id="v-pills-card-tab"
+                                data-bs-toggle="pill" data-bs-target="#v-pills-card" type="button" role="tab"><i
+                                    class="bi bi-credit-card me-2"></i>Credit / Debit / ATM Card</button>
+                            <button class="nav-link text-start fw-semibold mb-2" id="v-pills-netbanking-tab"
+                                data-bs-toggle="pill" data-bs-target="#v-pills-netbanking" type="button" role="tab"><i
+                                    class="bi bi-bank me-2"></i>Net Banking</button>
+                            <button class="nav-link text-start fw-semibold mb-2" id="v-pills-wallet-tab"
+                                data-bs-toggle="pill" data-bs-target="#v-pills-wallet" type="button" role="tab"><i
+                                    class="bi bi-wallet2 me-2"></i>Wallets</button>
+                            <button class="nav-link text-start fw-semibold mb-2" id="v-pills-cod-tab"
+                                data-bs-toggle="pill" data-bs-target="#v-pills-cod" type="button" role="tab"><i
+                                    class="bi bi-cash-coin me-2"></i>Cash on Delivery</button>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="tab-content w-100 p-4" id="v-pills-tabContent">
+
+                            <!-- UPI Section -->
+                            <div class="tab-pane fade show active" id="v-pills-upi" role="tabpanel">
+                                <h6 class="fw-bold mb-3">Pay by any UPI App</h6>
+                                <div class="mb-3">
+                                    <div class="form-check p-3 border rounded mb-2 bg-light">
+                                        <input class="form-check-input" type="radio" name="upiApp" id="gpay" checked>
+                                        <label class="form-check-label d-flex align-items-center" for="gpay">
+                                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/2560px-Google_Pay_Logo.svg.png"
+                                                alt="GPay" style="height: 20px;" class="me-2">
+                                            Google Pay
+                                        </label>
+                                    </div>
+                                    <div class="form-check p-3 border rounded mb-2 bg-light">
+                                        <input class="form-check-input" type="radio" name="upiApp" id="phonepe">
+                                        <label class="form-check-label d-flex align-items-center" for="phonepe">
+                                            <img src="https://download.logo.wine/logo/PhonePe/PhonePe-Logo.wine.png"
+                                                alt="PhonePe" style="height: 20px;" class="me-2">
+                                            PhonePe
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="d-grid">
+                                    <button class="btn btn-primary btn-lg pay-amount-btn"
+                                        onclick="simulatePayment('Prepaid')">Pay
+                                        {{total_amount|currency}}</button>
+                                </div>
+                            </div>
+
+                            <!-- Card Section -->
+                            <div class="tab-pane fade" id="v-pills-card" role="tabpanel">
+                                <h6 class="fw-bold mb-3">Enter Card Details</h6>
+                                <form onsubmit="event.preventDefault(); simulatePayment('Prepaid');">
+                                    <div class="mb-3">
+                                        <input type="text" id="card-number-input" class="form-control"
+                                            placeholder="Card Number" required onkeyup="checkBin(this)">
+                                    </div>
+                                    <div id="card-verify-msg" class="small mb-2 fw-bold"></div>
+
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-6">
+                                            <input type="text" class="form-control" placeholder="Valid Thru (MM/YY)"
+                                                required>
+                                        </div>
+                                        <div class="col-6">
+                                            <input type="password" class="form-control" placeholder="CVV" required>
+                                        </div>
+                                    </div>
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary btn-lg pay-amount-btn">Pay
+                                            {{total_amount|currency}}</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Net Banking Section -->
+                            <div class="tab-pane fade" id="v-pills-netbanking" role="tabpanel">
+                                <h6 class="fw-bold mb-3">Popular Banks</h6>
+                                <div class="row g-2 mb-3">
+                                    <div class="col-4"><button
+                                            class="btn btn-outline-secondary w-100 btn-sm">HDFC</button></div>
+                                    <div class="col-4"><button
+                                            class="btn btn-outline-secondary w-100 btn-sm">SBI</button></div>
+                                    <div class="col-4"><button
+                                            class="btn btn-outline-secondary w-100 btn-sm">ICICI</button></div>
+                                </div>
+                                <select class="form-select mb-3">
+                                    <option selected>Other Banks</option>
+                                    <option value="1">Axis Bank</option>
+                                    <option value="2">Kotak Bank</option>
+                                </select>
+                                <div class="d-grid">
+                                    <button class="btn btn-primary btn-lg pay-amount-btn"
+                                        onclick="simulatePayment('Prepaid')">Pay
+                                        {{total_amount|currency}}</button>
+                                </div>
+                            </div>
+
+                            <!-- Wallet Section -->
+                            <div class="tab-pane fade" id="v-pills-wallet" role="tabpanel">
+                                <h6 class="fw-bold mb-3">Select Wallet</h6>
+                                <div class="list-group">
+                                    <label class="list-group-item d-flex gap-2">
+                                        <input class="form-check-input flex-shrink-0" type="radio"
+                                            name="listGroupRadios" id="listGroupRadios1" value="" checked>
+                                        <span> Paytm Wallet</span>
+                                    </label>
+                                    <label class="list-group-item d-flex gap-2">
+                                        <input class="form-check-input flex-shrink-0" type="radio"
+                                            name="listGroupRadios" id="listGroupRadios2" value="">
+                                        <span> Airtel Money</span>
+                                    </label>
+                                </div>
+                                <div class="d-grid mt-3">
+                                    <button class="btn btn-primary btn-lg pay-amount-btn"
+                                        onclick="simulatePayment('Prepaid')">Pay
+                                        {{total_amount|currency}}</button>
+                                </div>
+                            </div>
+
+                            <!-- COD Section -->
+                            <div class="tab-pane fade" id="v-pills-cod" role="tabpanel">
+                                <h6 class="fw-bold mb-3">Cash on Delivery</h6>
+                                <div class="alert alert-info d-flex align-items-center mb-4">
+                                    <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+                                    <div>
+                                        Pay via Cash/UPI upon delivery. Additional ₹50 handling charge may apply for
+                                        some orders.
+                                    </div>
+                                </div>
+                                <div class="d-grid">
+                                    <button class="btn btn-success btn-lg" onclick="simulatePayment('COD')">Confirm
+                                        Order</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+<!-- COD Confirmation Modal -->
+<div class="modal fade" id="codConfirmationModal" tabindex="-1" aria-labelledby="codConfirmationModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" id="codConfirmationModalLabel">Confirm Order</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <div class="text-center mb-3">
+                    <i class="bi bi-question-circle text-primary" style="font-size: 3rem;"></i>
+                </div>
+                <p class="text-center mb-0 h6">Are you sure you want to place this order using <strong>Cash on
+                        Delivery</strong>?</p>
+            </div>
+            <div class="modal-footer border-0 pt-0 justify-content-center pb-4">
+                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary px-4" id="confirmCodBtn"
+                    onclick="submitPendingOrder(this)">Yes, Place Order</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+<!-- Redirecting Modal -->
+<div class="modal fade" id="redirectModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center py-5 border-0 shadow">
+            <div class="modal-body">
+                <div class="spinner-border text-primary mb-4" style="width: 3rem; height: 3rem;" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <h5 class="fw-bold text-dark">Redirecting to Payment Gateway...</h5>
+                <p class="text-muted small">Please do not refresh or close this page.</p>
+                <div class="progress mt-3 mx-auto" style="width: 60%; height: 4px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                        style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<input type="hidden" id="is_buy_now" value="{{is_buy_now}}">
+
+<!-- Mock Payment Script -->
+<script>
+    let pendingForm = null;
+    let appliedDiscount = null; // 'HDFC' or 'SBI' or null
+    const originalTotal = { total_amount };
+
+    let selectedCoupon = null; // Intent
+
+    function applyCoupon(code, btnElement) {
+        const discountRow = document.getElementById('discount-row');
+        const totalEl = document.getElementById('total-payable-display');
+
+        // Toggle Logic
+        if (selectedCoupon === code) {
+            selectedCoupon = null;
+            appliedDiscount = null; // Clear actual discount
+            discountRow.classList.add('d-none');
+            totalEl.textContent = '₹' + originalTotal;
+
+            // Visual Reset
+            resetCouponButtons();
+            document.getElementById('card-verify-msg').textContent = '';
+            return;
+        }
+
+        // Select Coupon Logic
+        resetCouponButtons();
+        selectedCoupon = code;
+        appliedDiscount = null; // Not applied yet!
+
+        // Reset Visuals
+        updatePriceDisplay();
+        updatePayButtons(originalTotal);
+
+        // Reset Total (in case switching from another applied coupon)
+        discountRow.classList.add('d-none');
+        totalEl.textContent = '₹' + originalTotal;
+
+        // Visual Active State
+        btnElement.classList.remove('btn-outline-success');
+        btnElement.classList.add('active', 'bg-success', 'bg-opacity-10', 'border-success');
+        const badge = btnElement.querySelector('.badge');
+        badge.textContent = 'Selected - Verify Card';
+        badge.classList.remove('bg-opacity-10', 'text-success');
+        badge.classList.add('bg-warning', 'text-dark');
+
+        // Prompt user
+        const verifyMsg = document.getElementById('card-verify-msg');
+        verifyMsg.textContent = `Please enter your ${code} card details to apply discount.`;
+        verifyMsg.className = 'small mb-2 fw-bold text-warning';
+
+        // Auto-check if card is already filled
+        const cardInput = document.getElementById('card-number-input');
+        if (cardInput.value.length > 0) {
+            checkBin(cardInput);
+        }
+    }
+
+    function resetCouponButtons() {
+        document.querySelectorAll('.coupon-btn').forEach(btn => {
+            btn.classList.remove('active', 'bg-success', 'bg-opacity-10', 'border-success');
+            btn.classList.add('btn-outline-success');
+            btn.querySelector('.badge').textContent = 'Apply';
+            btn.querySelector('.badge').className = 'badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2';
+        });
+    }
+
+
+
+    function checkBin(input, isManual = false) {
+        if (!selectedCoupon) return;
+
+        const val = input.value.replace(/\s+/g, '');
+        const verifyMsg = document.getElementById('card-verify-msg');
+        const discountRow = document.getElementById('discount-row');
+        const discountAmtEl = document.getElementById('discount-amount');
+        const totalEl = document.getElementById('total-payable-display');
+
+        let isValid = false;
+
+        if (selectedCoupon === 'HDFC' && val.startsWith('5')) {
+            isValid = true;
+        } else if (selectedCoupon === 'SBI' && val.startsWith('4')) {
+            isValid = true;
+        }
+
+        if (isValid) {
+            // Apply Discount
+            let disc = 0;
+            if (selectedCoupon === 'HDFC') disc = Math.round(originalTotal * 0.10);
+            if (selectedCoupon === 'SBI') disc = (originalTotal > 200) ? 200 : 0;
+
+            if (disc > 0) {
+                verifyMsg.textContent = `${selectedCoupon} Offer Applied!`;
+                verifyMsg.className = 'small mb-2 fw-bold text-success';
+
+                // Update UI: "Total Payable" + Card Pay Button
+                appliedDiscount = selectedCoupon; // Mark as applied
+                updatePriceDisplay();
+                updatePayButtons(originalTotal - disc);
+
+                // Update Badge
+                const activeBtn = document.querySelector('.coupon-btn.active .badge');
+                if (activeBtn) {
+                    activeBtn.textContent = 'Applied';
+                    activeBtn.className = 'badge bg-success text-white rounded-pill px-3 py-2';
+                }
+
+            } else {
+                verifyMsg.textContent = `Cart value too low for ${selectedCoupon} offer.`;
+                verifyMsg.className = 'small mb-2 fw-bold text-danger';
+            }
+        } else {
+            // Invalid
+            appliedDiscount = null;
+            updatePriceDisplay();
+            updatePayButtons(originalTotal);
+
+            if (val.length > 0) {
+                verifyMsg.textContent = `Card number does not match ${selectedCoupon} offer.`;
+                verifyMsg.className = 'small mb-2 fw-bold text-danger';
+                if (isManual) alert(`Card number must start with ${selectedCoupon === 'HDFC' ? '5' : '4'} for this offer.`);
+            } else {
+                verifyMsg.textContent = `Please enter your ${selectedCoupon} card details to apply discount.`;
+                verifyMsg.className = 'small mb-2 fw-bold text-warning';
+            }
+        }
+    }
+
+
+
+    function updatePayButtons(discountedTotal) {
+        // Only update buttons based on context
+        // 1. Card Button -> reduced price if discount is valid
+        // 2. Others -> Original price
+
+        // Find specific buttons (assumes order in HTML or adds IDs)
+        // Since we have a generic class, let's select them by context
+
+        const cardTabBtn = document.querySelector('#v-pills-card .pay-amount-btn');
+        if (cardTabBtn) cardTabBtn.textContent = 'Pay ₹' + discountedTotal;
+
+        // Reset others to original
+        document.querySelectorAll('.pay-amount-btn').forEach(btn => {
+            if (btn !== cardTabBtn) {
+                btn.textContent = 'Pay ₹' + originalTotal;
+            }
+        });
+    }
+
+    // Central UI Updater based on State
+    function updatePriceDisplay() {
+        const totalEl = document.getElementById('total-payable-display');
+        const discountRow = document.getElementById('discount-row');
+        const discountAmtEl = document.getElementById('discount-amount');
+        const activeTab = document.querySelector('.payment-sidebar .nav-link.active');
+        const activeTabId = activeTab ? activeTab.getAttribute('data-bs-target') : '';
+
+        // Check if verified discount exists AND we are on the Card tab
+        // (Since coupons are currently Card-only)
+        if (appliedDiscount && activeTabId === '#v-pills-card') {
+            // Calculate discount amount again or store it
+            let disc = 0;
+            if (appliedDiscount === 'HDFC') disc = Math.round(originalTotal * 0.10);
+            if (appliedDiscount === 'SBI') disc = (originalTotal > 200) ? 200 : 0;
+
+            totalEl.textContent = '₹' + (originalTotal - disc);
+            discountAmtEl.textContent = '-₹' + disc;
+            discountRow.classList.remove('d-none');
+        } else {
+            // Revert to original
+            totalEl.textContent = '₹' + originalTotal;
+            discountRow.classList.add('d-none');
+        }
+    }
+
+    // Add Tab Change Listener
+    document.addEventListener('DOMContentLoaded', function () {
+        var triggerTabList = [].slice.call(document.querySelectorAll('.payment-sidebar .nav-link'))
+        triggerTabList.forEach(function (triggerEl) {
+            var tabTrigger = new bootstrap.Tab(triggerEl)
+            triggerEl.addEventListener('shown.bs.tab', function (event) {
+                updatePriceDisplay(); // Re-evaluate price on tab switch
+            })
+        })
+    });
+
+    function simulatePayment(mode = 'Prepaid') {
+        // Validation for Address Fields
+        const requiredIds = ['payment-address', 'payment-city', 'payment-state', 'payment-zipcode', 'payment-phone'];
+        for (const id of requiredIds) {
+            const el = document.getElementById(id);
+            if (!el || !el.value.trim()) {
+                alert('Please fill in all Delivery Address details before proceeding.');
+                el.focus();
+                return;
+            }
+        }
+
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/check-out'; // Using existing checkout
+
+        const csrfToken = '{{ csrf_token }}';
+        const csrfInput = document.createElement('input');
+        csrfInput.type = 'hidden';
+        csrfInput.name = 'csrfmiddlewaretoken';
+        csrfInput.value = csrfToken;
+        form.appendChild(csrfInput);
+
+        // Add minimal required fields to pass validation
+        // In a real flow, these should be confirmed before payment page
+        const addressInput = document.createElement('input');
+        addressInput.type = 'hidden';
+        addressInput.name = 'address';
+        addressInput.value = document.getElementById('payment-address').value;
+        form.appendChild(addressInput);
+
+        const phoneInput = document.createElement('input');
+        phoneInput.type = 'hidden';
+        phoneInput.name = 'phone';
+        phoneInput.value = document.getElementById('payment-phone').value;
+        form.appendChild(phoneInput);
+
+        const cityInput = document.createElement('input');
+        cityInput.type = 'hidden';
+        cityInput.name = 'city';
+        cityInput.value = document.getElementById('payment-city').value;
+        form.appendChild(cityInput);
+
+        const stateInput = document.createElement('input');
+        stateInput.type = 'hidden';
+        stateInput.name = 'state';
+        stateInput.value = document.getElementById('payment-state').value;
+        form.appendChild(stateInput);
+
+        const zipInput = document.createElement('input');
+        zipInput.type = 'hidden';
+        zipInput.name = 'zipcode';
+        zipInput.value = document.getElementById('payment-zipcode').value;
+        form.appendChild(zipInput);
+
+        // Add a flag to indicate online payment status
+        const paymentInput = document.createElement('input');
+        paymentInput.type = 'hidden';
+        paymentInput.name = 'payment_mode';
+        paymentInput.value = mode;
+        form.appendChild(paymentInput);
+
+        // Add buy_now flag
+        const isBuyNowInput = document.createElement('input');
+        isBuyNowInput.type = 'hidden';
+        isBuyNowInput.name = 'is_buy_now';
+        // Get value from the hidden input we added to the page
+        isBuyNowInput.value = document.getElementById('is_buy_now').value;
+        form.appendChild(isBuyNowInput);
+
+        if (appliedDiscount) {
+            const offerInput = document.createElement('input');
+            offerInput.type = 'hidden';
+            offerInput.name = 'bank_offer';
+            offerInput.value = appliedDiscount;
+            form.appendChild(offerInput);
+        }
+
+        document.body.appendChild(form);
+
+        // Show loading or alert
+        // Show Confirmation Modal for BOTH Prepaid and COD
+        pendingForm = form;
+        const modalEl = document.getElementById('codConfirmationModal');
+        const modalBody = modalEl.querySelector('.modal-body p');
+        const confirmBtn = document.getElementById('confirmCodBtn');
+
+        if (mode === 'Prepaid') {
+            modalBody.innerHTML = 'You are about to be redirected to the secure payment gateway.<br><strong>Do you want to proceed?</strong>';
+            confirmBtn.innerText = "Proceed to Pay";
+            confirmBtn.classList.remove('btn-primary');
+            confirmBtn.classList.add('btn-success'); // Green for Pay
+        } else {
+            modalBody.innerHTML = 'Are you sure you want to place this order using <strong>Cash on Delivery</strong>?';
+            confirmBtn.innerText = "Yes, Place Order";
+            confirmBtn.classList.remove('btn-success');
+            confirmBtn.classList.add('btn-primary'); // Blue for Order
+        }
+
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+
+        // Handle Modal Dismissal Cleanup
+        modalEl.addEventListener('hidden.bs.modal', function () {
+            if (pendingForm) {
+                if (document.body.contains(pendingForm)) {
+                    document.body.removeChild(pendingForm);
+                }
+                pendingForm = null;
+            }
+        }, { once: true });
+    }
+
+    // Global submission handler for robustness
+    function submitPendingOrder(confirmBtn) {
+        if (!pendingForm) {
+            console.error("No pending form found!");
+            alert("Error: No order data found. Please try again.");
+            return;
+        }
+
+        console.log("Confirming Order...");
+        const formToSubmit = pendingForm; // Save reference
+        pendingForm = null; // Prevent cleanup listener from removing it
+
+        // Hide confirmation modal
+        const modalEl = document.getElementById('codConfirmationModal');
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        modal.hide();
+
+        // Check if it's Prepaid (Green Button) or COD (Blue Button)
+        if (confirmBtn.classList.contains('btn-success')) {
+            // Show Redirect Modal
+            const redirectModal = new bootstrap.Modal(document.getElementById('redirectModal'));
+            redirectModal.show();
+
+            // Simulate Gateway Delay
+            setTimeout(() => {
+                console.log("Submitting Prepaid Order...");
+                formToSubmit.submit();
+            }, 3000);
+        } else {
+            // COD - Validate & Submit Immediately
+            console.log("Submitting COD Order directly...");
+            formToSubmit.submit();
+        }
+    }
+
+    // Attach listener once (Removed double binding, using direct onclick)
+    /*
+    document.addEventListener('DOMContentLoaded', function () {
+        // Validation moved to submitPendingOrder
+    });
+    */
+</script>
+
+<script>
+    const stateCityMap = {
+        "Andhra Pradesh": ["Visakhapatnam", "Vijayawada", "Guntur", "Nellore", "Kurnool"],
+        "Arunachal Pradesh": ["Itanagar", "Naharlagun", "Pasighat"],
+        "Assam": ["Guwahati", "Silchar", "Dibrugarh", "Jorhat"],
+        "Bihar": ["Patna", "Gaya", "Bhagalpur", "Muzaffarpur"],
+        "Chhattisgarh": ["Raipur", "Bhilai", "Bilaspur", "Korba"],
+        "Goa": ["Panaji", "Margao", "Vasco da Gama"],
+        "Gujarat": ["Ahmedabad", "Surat", "Vadodara", "Rajkot", "Bhavnagar"],
+        "Haryana": ["Faridabad", "Gurugram", "Panipat", "Ambala"],
+        "Himachal Pradesh": ["Shimla", "Dharamshala", "Solan", "Mandi"],
+        "Jharkhand": ["Ranchi", "Jamshedpur", "Dhanbad", "Bokaro"],
+        "Karnataka": ["Bengaluru", "Mysuru", "Hubballi", "Mangaluru"],
+        "Kerala": ["Thiruvananthapuram", "Kochi", "Kozhikode", "Thrissur"],
+        "Madhya Pradesh": ["Indore", "Bhopal", "Jabalpur", "Gwalior"],
+        "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik", "Aurangabad"],
+        "Manipur": ["Imphal", "Thoubal"],
+        "Meghalaya": ["Shillong", "Tura"],
+        "Mizoram": ["Aizawl", "Lunglei"],
+        "Nagaland": ["Dimapur", "Kohima"],
+        "Odisha": ["Bhubaneswar", "Cuttack", "Rourkela", "Berhampur"],
+        "Punjab": ["Ludhiana", "Amritsar", "Jalandhar", "Patiala"],
+        "Rajasthan": ["Jaipur", "Jodhpur", "Udaipur", "Kota"],
+        "Sikkim": ["Gangtok"],
+        "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai", "Tiruchirappalli"],
+        "Telangana": ["Hyderabad", "Warangal", "Nizamabad", "Karimnagar"],
+        "Tripura": ["Agartala"],
+        "Uttar Pradesh": ["Lucknow", "Kanpur", "Ghaziabad", "Agra", "Varanasi"],
+        "Uttarakhand": ["Dehradun", "Haridwar", "Roorkee", "Haldwani"],
+        "West Bengal": ["Kolkata", "Howrah", "Durgapur", "Siliguri"],
+        "Delhi": ["New Delhi", "North Delhi", "South Delhi", "East Delhi", "West Delhi"]
+    };
+
+    const paymentStateSelect = document.getElementById('payment-state');
+    const paymentCitySelect = document.getElementById('payment-city');
+
+    // Populate States
+    for (let state in stateCityMap) {
+        let option = document.createElement('option');
+        option.value = state;
+        option.text = state;
+        paymentStateSelect.appendChild(option);
+    }
+
+    // Handle Change
+    paymentStateSelect.addEventListener('change', function () {
+        const selectedState = this.value;
+        paymentCitySelect.innerHTML = '<option value="">Select City</option>';
+
+        if (selectedState && stateCityMap[selectedState]) {
+            stateCityMap[selectedState].forEach(city => {
+                let option = document.createElement('option');
+                option.value = city;
+                option.text = city;
+                paymentCitySelect.appendChild(option);
+            });
+        }
+    });
+
+    // Pre-select Saved Values
+    const savedPaymentState = "{{customer.state|default:''}}";
+    const savedPaymentCity = "{{customer.city|default:''}}";
+
+    if (savedPaymentState) {
+        paymentStateSelect.value = savedPaymentState;
+        // Trigger change manually to populate cities
+        paymentStateSelect.dispatchEvent(new Event('change'));
+
+        if (savedPaymentCity) {
+            paymentCitySelect.value = savedPaymentCity;
+        }
+    }
+</script>
+{% endblock %}

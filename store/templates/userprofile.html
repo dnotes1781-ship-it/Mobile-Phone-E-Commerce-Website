@@ -1,87 +1,168 @@
 {% extends 'base.html' %}
 
-
 {% block content %}
 
-<div class="container mt-4">
-    
-    <div class="p-4 m-4">
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card card-custom p-4 p-md-5">
+                <div class="text-center mb-4">
+                    <h2 class="fw-bold">User Profile</h2>
+                    <p class="text-muted">Manage your account details</p>
+                </div>
 
-        
-        <div class="col-lg-5 rounded mx-auto border pt-4">
-            <div class="text-center col">
-            
-            <!-- <hr> -->
-            <div class="display-8">User Profile</div>
-            <hr>
-            </div>
-            <h3 hidden class="alert alert-light border rounded">Create An Account</h3>
-        
-                    <form action="/userprofile" method="POST">
-                
-                {% csrf_token %}
-
-                {% if error%}
+                {% if error %}
                 <div class="alert alert-danger" role="alert">
                     {{error}}
                 </div>
                 {% endif %}
-                <!-- firstname -->
-                <div class="form-group">
-                    <label for="">First Name</label>
-                    <input type="text" name="first_name"
-                     id="first_name" value="{{customer.first_name}}" class="form-control form-control-sm" 
-                     placeholder="">
+
+                {% if success %}
+                <div class="alert alert-success" role="alert">
+                    {{success}}
                 </div>
+                {% endif %}
 
-                <!-- last name -->
-                <div class="form-group">
-                    <label for="">Last Name</label>
-                    <input type="text" name="last_name" 
-                    id="last_name" value="{{customer.last_name}}" class="form-control form-control-sm"
-                    >
-                </div>
+                <form action="/userprofile" method="POST">
+                    {% csrf_token %}
 
-                <!-- phone -->
-                <div class="form-group">
-                    <label for="">Phone</label>
-                    <input type="text" name="phone" 
-                    id="phone" class="form-control form-control-sm"
-                    value="{{customer.phone}}"
-                    
-                    >
-                </div>
-                <!-- email -->
-                <div class="form-group">
-                    <label for="">Email</label>
-                    <input required type="email" name="email" id="email"
-                    value="{{customer.email}}" 
-                    class=" form-control-sm form-control" >
-                </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="first_name" class="form-label">First Name</label>
+                            <input type="text" name="first_name" id="first_name" value="{{customer.first_name}}"
+                                class="form-control" placeholder="John">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="last_name" class="form-label">Last Name</label>
+                            <input type="text" name="last_name" id="last_name" value="{{customer.last_name}}"
+                                class="form-control" placeholder="Doe">
+                        </div>
 
+                        <div class="col-12">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" name="phone" id="phone" value="{{customer.phone}}" class="form-control"
+                                placeholder="+1234567890">
+                        </div>
 
-                <!-- password -->
+                        <div class="col-12">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input required type="email" name="email" id="email" value="{{customer.email}}"
+                                class="form-control" placeholder="name@example.com">
+                        </div>
 
+                        <div class="col-12">
+                            <hr class="my-3">
+                            <h5 class="mb-3 fw-bold">Address Details</h5>
+                        </div>
 
-                <hr>
-                <div class="form-group">
-                    <input class="btn btn-sm btn-info" type="submit" value="Update">
-                </div>
+                        <div class="col-12">
+                            <label for="address" class="form-label">Street Address</label>
+                            <textarea name="address" id="address" class="form-control" rows="2"
+                                placeholder="123 Main St">{{customer.address|default:''}}</textarea>
+                        </div>
 
-                
-            </form>
+                        <div class="col-md-4">
+                            <label for="state" class="form-label">State</label>
+                            <select name="state" id="state" class="form-select">
+                                <option value="">Select State</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="city" class="form-label">City</label>
+                            <select name="city" id="city" class="form-select">
+                                <option value="">Select City</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-4">
+                            <label for="zipcode" class="form-label">Zip Code</label>
+                            <input type="text" name="zipcode" id="zipcode" value="{{customer.zipcode|default:''}}"
+                                class="form-control" placeholder="380001">
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-grid">
+                        <button class="btn btn-primary-custom" type="submit">Update Profile</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
-<div class="container">
-    <footer class="py-3 my-4" style="background-color: black">
-      <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-        <li class="nav-item"><a href="#" class="nav-link px-2 " style="color:white">Home</a></li>
-        <li class="nav-item"><a href="/store1" class="nav-link px-2 " style="color:white">Products</a></li>
-        
-        <li class="nav-item"><a href="/aboutus" class="nav-link px-2 " style="color:white">About us</a></li>
-      </ul>
-      <p class="text-center "style="color:white">&copy; 2021 Company, Inc</p>
-    </footer>
-  </div>
+
+<script>
+    const stateCityMap = {
+        "Andhra Pradesh": ["Visakhapatnam", "Vijayawada", "Guntur", "Nellore", "Kurnool"],
+        "Arunachal Pradesh": ["Itanagar", "Naharlagun", "Pasighat"],
+        "Assam": ["Guwahati", "Silchar", "Dibrugarh", "Jorhat"],
+        "Bihar": ["Patna", "Gaya", "Bhagalpur", "Muzaffarpur"],
+        "Chhattisgarh": ["Raipur", "Bhilai", "Bilaspur", "Korba"],
+        "Goa": ["Panaji", "Margao", "Vasco da Gama"],
+        "Gujarat": ["Ahmedabad", "Surat", "Vadodara", "Rajkot", "Bhavnagar"],
+        "Haryana": ["Faridabad", "Gurugram", "Panipat", "Ambala"],
+        "Himachal Pradesh": ["Shimla", "Dharamshala", "Solan", "Mandi"],
+        "Jharkhand": ["Ranchi", "Jamshedpur", "Dhanbad", "Bokaro"],
+        "Karnataka": ["Bengaluru", "Mysuru", "Hubballi", "Mangaluru"],
+        "Kerala": ["Thiruvananthapuram", "Kochi", "Kozhikode", "Thrissur"],
+        "Madhya Pradesh": ["Indore", "Bhopal", "Jabalpur", "Gwalior"],
+        "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik", "Aurangabad"],
+        "Manipur": ["Imphal", "Thoubal"],
+        "Meghalaya": ["Shillong", "Tura"],
+        "Mizoram": ["Aizawl", "Lunglei"],
+        "Nagaland": ["Dimapur", "Kohima"],
+        "Odisha": ["Bhubaneswar", "Cuttack", "Rourkela", "Berhampur"],
+        "Punjab": ["Ludhiana", "Amritsar", "Jalandhar", "Patiala"],
+        "Rajasthan": ["Jaipur", "Jodhpur", "Udaipur", "Kota"],
+        "Sikkim": ["Gangtok"],
+        "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai", "Tiruchirappalli"],
+        "Telangana": ["Hyderabad", "Warangal", "Nizamabad", "Karimnagar"],
+        "Tripura": ["Agartala"],
+        "Uttar Pradesh": ["Lucknow", "Kanpur", "Ghaziabad", "Agra", "Varanasi"],
+        "Uttarakhand": ["Dehradun", "Haridwar", "Roorkee", "Haldwani"],
+        "West Bengal": ["Kolkata", "Howrah", "Durgapur", "Siliguri"],
+        "Delhi": ["New Delhi", "North Delhi", "South Delhi", "East Delhi", "West Delhi"]
+    };
+
+    const stateSelect = document.getElementById('state');
+    const citySelect = document.getElementById('city');
+
+    // Populate States
+    for (let state in stateCityMap) {
+        let option = document.createElement('option');
+        option.value = state;
+        option.text = state;
+        stateSelect.appendChild(option);
+    }
+
+    // Handle Change
+    stateSelect.addEventListener('change', function () {
+        const selectedState = this.value;
+        citySelect.innerHTML = '<option value="">Select City</option>'; // Clear
+
+        if (selectedState && stateCityMap[selectedState]) {
+            stateCityMap[selectedState].forEach(city => {
+                let option = document.createElement('option');
+                option.value = city;
+                option.text = city;
+                citySelect.appendChild(option);
+            });
+        }
+    });
+
+    // Pre-select Saved Values
+    const savedState = "{{customer.state|default:''}}";
+    const savedCity = "{{customer.city|default:''}}";
+
+    if (savedState) {
+        stateSelect.value = savedState;
+        // Trigger change manually to populate cities
+        stateSelect.dispatchEvent(new Event('change'));
+
+        if (savedCity) {
+            citySelect.value = savedCity;
+        }
+    }
+</script>
+
 {% endblock %}

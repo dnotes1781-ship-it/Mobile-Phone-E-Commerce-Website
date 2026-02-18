@@ -34,7 +34,7 @@ class feedback(View):
             print(email, message)
             
             feedback.register()
-            return render(request, 'feedback.html', {'error':'Your Feedback Added Successfully..'})
+            return render(request, 'feedback.html', {'success':'Your Feedback Added Successfully..'})
         else:
             data = {
                 'error': error_message,

@@ -8,6 +8,31 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, default=1)
     description = models.CharField(max_length=200, default='' , null=True , blank=True)
     image = models.ImageField(upload_to='uploads/products/')
+    
+    # Specifications
+    brand = models.CharField(max_length=50, default='', null=True, blank=True)
+    ram = models.CharField(max_length=50, default='', null=True, blank=True)
+    storage = models.CharField(max_length=50, default='', null=True, blank=True)
+    camera = models.CharField(max_length=100, default='', null=True, blank=True)
+    battery = models.CharField(max_length=50, default='', null=True, blank=True)
+    screen_size = models.CharField(max_length=50, default='', null=True, blank=True)
+    color = models.CharField(max_length=50, default='', null=True, blank=True)
+
+    # Variant Linking
+    variant_name = models.CharField(max_length=100, default='', null=True, blank=True)
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='variants')
+
+    # Bundle Linking
+    compatible_accessories = models.ManyToManyField('self', blank=True, symmetrical=False, related_name='main_products')
+    
+    # Dynamic Specifications
+    specifications = models.JSONField(default=dict, blank=True, null=True)
+
+    def get_bundle_price(self):
+        total = self.price
+        for acc in self.compatible_accessories.all():
+            total += acc.price
+        return total
 
     @staticmethod
     def get_products_by_id(ids):
