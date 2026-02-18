@@ -25,7 +25,9 @@ SECRET_KEY = '^_g%33qd(g8bjc+*40&uh(ptgkb$&-*+0!i3$lu7xj1u166cbb'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# Allow hosts configured via environment variable (comma-separated),
+# fallback includes common local hosts and the Render app hostname.
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'mobile-phone-e-commerce-website.onrender.com,localhost,127.0.0.1').split(',')
 
 
 # Application definition
@@ -42,13 +44,13 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'store.middlewares.auth.auth_middleware'
 ]
 
 ROOT_URLCONF = 'Eshop.urls'
@@ -126,6 +128,9 @@ MEDIA_ROOT = BASE_DIR
 STATICFILES_DIRS=(
     os.path.join(BASE_DIR,'static'),
 )
+
+# Use BigAutoField by default to avoid auto-field warnings.
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email Configuration (Console Backend for Development)
 # This will print emails to the terminal instead of sending them.
